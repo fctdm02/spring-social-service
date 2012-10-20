@@ -53,31 +53,31 @@ public class SocialServiceIntegrationTest extends AbstractSocialServiceIntegrati
 	private static final String GET_SOCIAL_FRIENDS_REST_SIGNATURE 							= "/friends?promotionDeployPath={promotionDeployPath}&providerId={providerId}&id={id}&offset={offset}&limit={limit}&accessToken={accessToken}&accessTokenSecret={accessTokenSecret}";
 	
 	@Drone 
-	HtmlUnitDriver driver;	
+	protected HtmlUnitDriver driver;	
 	
 	@ArquillianResource 
-	URL deploymentUrl;
+	protected URL deploymentUrl;
 	
 	
-	String promotionDeployPath = "djt/dev-wks-testpromo";
+	protected String promotionDeployPath = "djt/dev-wks-testpromo";
 
 	
 	// TODO: What happens when these access tokens expire?
-	String testFacebookUserId = "100003986680460";
-	String testFacebookAlbumId = "122532174556338";
-	String testFacebookAccessToken = "AAADrESbHw04BACHeQyvV0kd4G2ZCuOPxCTfHoZBKneakZBS1ZBcuQ5u9ZCGApwltVEAUlkp7UxlrahIyfngZCHviiESg4SMwA53G3W6QUYsAZDZD";
-	String testFacebookAccessTokenSecret = "";
-    String testFacebookApiKey = "478237082200706";
-    String testFacebookApiKeySecret = "83d02f698a33cfdcf479e05905f39609";
+	protected String testFacebookUserId = "100003986680460";
+	protected String testFacebookAlbumId = "122532174556338";
+	protected String testFacebookAccessToken = "AAADrESbHw04BACHeQyvV0kd4G2ZCuOPxCTfHoZBKneakZBS1ZBcuQ5u9ZCGApwltVEAUlkp7UxlrahIyfngZCHviiESg4SMwA53G3W6QUYsAZDZD";
+	protected String testFacebookAccessTokenSecret = "";
+    protected String testFacebookApiKey = "478237082200706";
+    protected String testFacebookApiKeySecret = "83d02f698a33cfdcf479e05905f39609";
 	
-	String testInstagramUserId = "184525800";
-	String testInstagramAlbumId = "0";
-	String testInstagramAccessToken = "184525800.aeb2ea9.9a1a302a35af43d3bea0d8a851eb5a6c";
-	String testInstagramAccessTokenSecret = "";
+	protected String testInstagramUserId = "184525800";
+	protected String testInstagramAlbumId = "0";
+	protected String testInstagramAccessToken = "184525800.aeb2ea9.9a1a302a35af43d3bea0d8a851eb5a6c";
+	protected String testInstagramAccessTokenSecret = "";
 
-	String testFlickrAlbumId = "0";
-	String testFlickrAccessToken = "72157631328487046-86074216899be19a";
-	String testFlickrAccessTokenSecret = "e2fc15d4647279e3";
+	protected String testFlickrAlbumId = "0";
+	protected String testFlickrAccessToken = "72157631328487046-86074216899be19a";
+	protected String testFlickrAccessTokenSecret = "e2fc15d4647279e3";
 	
 	@BeforeClass
 	public static void beforeClass() throws Exception {

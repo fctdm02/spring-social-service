@@ -7,16 +7,16 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-@RunWith(Suite.class)
-@SuiteClasses({
-	SocialServiceIntegrationTest.class
-})
 
 /**
  * 
  * @author Tom.Myers
  *
  */
+@RunWith(Suite.class)
+@SuiteClasses({
+	SocialServiceIntegrationTest.class
+})
 public class AllSocialServiceIntegrationTests {
 
 }
