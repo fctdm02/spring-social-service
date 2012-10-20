@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd" >
+<log4j:configuration>
+	
+	<!-- http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/PatternLayout.html -->
+	<appender name="stdout" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{ABSOLUTE} %p [%t] %c{3} - %m%n"/>
+		</layout>
+	</appender>
+
+    <root>
+        <level value="DEBUG"></level>
+        <appender-ref ref="stdout"/>        
+    </root> 
+ 		
+    <logger name="com.djt.social">
+        <level value="DEBUG"/>
+        <appender-ref ref="stdout"/>
+    </logger>
+		
+</log4j:configuration>

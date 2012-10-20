@@ -1,0 +1,222 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:tx="http://www.springframework.org/schema/tx"
+	   xmlns:jee="http://www.springframework.org/schema/jee"
+	   xmlns:social="http://www.springframework.org/schema/spring-social"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:jaxws="http://cxf.apache.org/jaxws"
+       xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+       xmlns:cxf="http://cxf.apache.org/core"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+	        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+			http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.1.xsd
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+			http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.1.xsd
+			http://www.springframework.org/schema/spring-social http://www.springframework.org/schema/social/spring-social-1.0.xsd
+			http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd
+            http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+            http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+            http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
+
+
+	<!-- ENVIRONMENT SPECIFIC PROPERTIES AND BEANS -->
+   <bean id="propertyConfigurer" class="com.djt.social.config.EnvironmentPropertyPlaceholderConfigurer" scope="singleton">
+   </bean>
+
+
+    <!-- SOCIAL EVENT HELPER (FOR WHEN SOCIAL PROVIDER API KEYS ARE INSTALLED OR USER ACCESS TOKENS ARE REMOVED) -->
+    <bean
+    	id="socialEventHelper"
+    	class="com.djt.social.event.SocialEventHelper"
+    	scope="singleton">
+    	<aop:scoped-proxy proxy-target-class="false" />
+    </bean>
+
+
+	<!-- PERSISTENCE -->
+	<!-- Configures transaction management around @Transactional components -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+		
+	<!-- Connection Pooled Data Source -->
+	<!-- <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<property name="driverClass" value="com.mysql.jdbc.Driver" />
+		<property name="jdbcUrl" value="jdbc:mysql://${dataSource.host}/social" />
+		<property name="user" value="${social.dataSource.username}" />
+		<property name="password" value="${social.dataSource.password}" />
+		<property name="properties">
+			<props>
+				<prop key="user">${social.dataSource.username}</prop>
+				<prop key="password">${social.dataSource.password}</prop>
+				<prop key="acquireIncrement">${social.dataSource.c3po.acquireIncrement}</prop>
+				<prop key="minPoolSize">${social.dataSource.c3po.minPoolSize}</prop>
+				<prop key="initialPoolSize">${social.dataSource.c3po.initialPoolSize}</prop>
+				<prop key="maxPoolSize">${social.dataSource.c3po.maxPoolSize}</prop>
+				<prop key="maxConnectionAge">${social.dataSource.c3po.maxConnectionAge}</prop>
+				<prop key="maxIdleTime">${social.dataSource.c3po.maxIdleTime}</prop>
+				<prop key="maxIdleTimeExcessConnections">${social.dataSource.c3po.maxIdleTimeExcessConnections}</prop>
+				<prop key="idleConnectionTestPeriod">${social.dataSource.c3po.idleConnectionTestPeriod}</prop>
+				<prop key="testConnectionOnCheckin">${social.dataSource.c3po.testConnectionOnCheckin}</prop>
+				<prop key="testConnectionOnCheckout">${social.dataSource.c3po.testConnectionOnCheckout}</prop>
+				<prop key="preferredTestQuery">${social.datasource.c3po.preferredTestQuery}</prop>
+				<prop key="maxStatementsPerConnection">${social.dataSource.c3po.maxStatementsPerConnection}</prop>
+				<prop key="acquireRetryAttempts">${social.dataSource.c3po.acquireRetryAttempts}</prop>
+				<prop key="acquireRetryDelay">${social.dataSource.c3po.acquireRetryDelay}</prop>
+				<prop key="breakAfterAcquireFailure">${social.dataSource.c3po.breakAfterAcquireFailure}</prop>
+			</props>
+		</property>
+	</bean> -->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <constructor-arg index="0" value="com.mysql.jdbc.Driver" />
+        <constructor-arg index="1" value="jdbc:mysql://${dataSource.host}/social" />
+        <constructor-arg index="2" value="${social.dataSource.username}" />
+        <constructor-arg index="3" value="${social.dataSource.password}" />
+    </bean>
+	
+	
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- Shared JDBC Data Access Template -->
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<constructor-arg ref="dataSource" />
+	</bean>
+
+	<bean id="databaseInitializer" class="org.springframework.jdbc.datasource.init.DataSourceInitializer" depends-on="dataSource">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="databasePopulator">
+			<bean class="org.springframework.jdbc.datasource.init.ResourceDatabasePopulator">
+				<property name="scripts" value="classpath:/com/djt/social/persistence/SocialService_tables.sql"/>
+				<property name="continueOnError" value="true"/>
+			</bean> 
+		</property>
+	</bean>
+
+	<!-- 
+	When the following text encrypter is used, Spring Social throws an exception with the message: "Unable to initialize due to invalid secret key"
+	The resolution involves having the unlimited strength JCE policy files added to the JRE.  Not sure how to resolve this without manual modification of JRE
+	 
+    <bean id="textEncryptor" class="org.springframework.security.crypto.encrypt.Encryptors" factory-method="text">
+        <constructor-arg index="0" value="${security.encryptPassword}" />
+        <constructor-arg index="1" value="${security.encryptSalt}" />
+    </bean>
+	 -->
+
+    <bean id="textEncryptor" class="org.springframework.security.crypto.encrypt.Encryptors" factory-method="noOpText">
+    </bean>
+	
+	<bean id="socialConnectionRepositoryFactory" class="com.djt.social.persistence.impl.SocialConnectionRepositoryFactoryImpl" scope="singleton">
+		<constructor-arg ref="dataSource" />
+		<constructor-arg ref="socialConnectionRepositoryFactoryLocator" />
+		<constructor-arg ref="textEncryptor" />
+		<aop:scoped-proxy proxy-target-class="false" />
+	</bean>
+
+	<bean id="connectionRepository" factory-method="createConnectionRepository" factory-bean="socialConnectionRepositoryFactory" scope="request">
+		<constructor-arg value="#{session.getAttribute('promotionDeployPath')}" />
+		<constructor-arg value="#{session.getAttribute('uid')}" />
+		<aop:scoped-proxy proxy-target-class="false" />
+	</bean>
+
+	<bean id="socialProviderApiKeyRepository" class="com.djt.social.persistence.impl.SocialProviderApiKeyRepositoryImpl" scope="singleton">
+		<constructor-arg ref="dataSource" />
+		<constructor-arg ref="textEncryptor" />
+		<aop:scoped-proxy proxy-target-class="false" />
+	</bean>
+	
+	
+	<!-- SPRING SOCIAL -->
+	<bean id="socialConnectionRepositoryFactoryLocator" class="com.djt.social.persistence.impl.SocialConnectionRepositoryFactoryLocatorImpl" scope="singleton">
+		<constructor-arg ref="socialProviderApiKeyRepository" index="0" type="com.djt.social.persistence.ISocialProviderApiKeyRepository" />
+		<constructor-arg ref="socialEventHelper" index="1" type="com.djt.social.event.ISocialEventHelper"/>
+		<aop:scoped-proxy proxy-target-class="false" />
+	</bean>
+
+
+	<!-- LOGGING INTERCEPTOR -->
+	<bean
+	   id="loggingInterceptor"
+	   class="com.djt.social.interceptor.LoggingInterceptor"
+	   scope="singleton">
+	</bean>
+
+
+	<!-- SOCIAL MEDIA QUERY CACHE (USING GOOGLE GUAVA) -->
+	<bean
+	   id="socialMediaQueryCache"
+	   class="com.djt.social.cache.impl.SocialMediaQueryCacheImpl"
+	   scope="singleton">
+	   <constructor-arg value="${social.socialMediaCache.expirationMinutes}" index="0"/>
+	   <constructor-arg value="${social.socialMediaCache.maxNumberElements}" index="1"/>
+	</bean>
+
+	<!-- ACCESS TOKEN CACHE (USING GOOGLE GUAVA) -->
+	<bean
+	   id="accessTokenCache"
+	   class="com.djt.social.cache.impl.AccessTokenCacheImpl"
+	   scope="singleton">
+	   <constructor-arg value="${social.accessTokenCache.expirationMinutes}" index="0"/>
+	   <constructor-arg value="${social.accessTokenCache.maxNumberElements}" index="1"/>
+	   <constructor-arg value="${social.enableAccessTokenPersistence}" index="2" />	   
+	</bean>
+
+
+	<!-- JACKSON JSON PROCESSOR -->
+    <bean 
+    	id="jsonProvider" 
+    	class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"
+    	scope="singleton">
+     </bean>
+     
+     
+	<!-- SOCIAL SERVICE -->
+	<bean 
+	   id="socialService" 
+	   class="com.djt.social.service.impl.SocialServiceImpl" 
+	   scope="singleton">
+	   <constructor-arg ref="socialProviderApiKeyRepository" index="0" type="com.djt.social.persistence.ISocialProviderApiKeyRepository"/>
+	   <constructor-arg ref="socialConnectionRepositoryFactory" index="1" type="com.djt.social.persistence.ISocialConnectionRepositoryFactory"/>
+	   <constructor-arg ref="socialMediaQueryCache" index="2" type="com.djt.social.cache.ISocialMediaQueryCache"/>
+	   <constructor-arg ref="accessTokenCache" index="3" type="com.djt.social.cache.IAccessTokenCache"/>
+	   <constructor-arg value="${social.url.salt}" index="4" type="java.lang.String"/>
+	   <constructor-arg ref="socialEventHelper" index="5" type="com.djt.social.event.ISocialEventHelper"/>
+	   <constructor-arg value="${social.enableAccessTokenPersistence}" index="6" type="java.lang.String" />
+	</bean>  
+	
+	<bean id="socialServiceProxy" 
+	   class="org.springframework.aop.framework.ProxyFactoryBean">
+	   <property 
+	      name="proxyInterfaces" 
+	      value="com.djt.social.service.ISocialService"/>
+	   <property name="interceptorNames">
+	      <list>
+	         <idref bean="loggingInterceptor"/>
+	         <idref local="socialService"/>
+	      </list>
+	   </property>
+	</bean>      
+
+
+	<!-- APACHE CXF SOCIAL REST/JSON WEB SERVICE -->
+    <jaxrs:server id="socialServiceJaxRsServer" address="/social/">
+        <jaxrs:features>
+            <cxf:logging/>
+        </jaxrs:features>
+        <jaxrs:serviceBeans>
+            <ref bean="socialServiceProxy"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jsonProvider"/>
+        </jaxrs:providers>
+        <jaxrs:extensionMappings>
+            <entry key="json" value="application/json"/>
+        </jaxrs:extensionMappings>
+    </jaxrs:server>	
+	
+ </beans>

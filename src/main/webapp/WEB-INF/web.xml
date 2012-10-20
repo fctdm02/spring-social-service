@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0">
+
+	<!-- http://docs.oracle.com/cd/E13222_01/wls/docs81/webapp/web_xml.html -->
+
+	<display-name>Spring Social Service</display-name>
+  
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/applicationContext*.xml</param-value>
+	</context-param>
+	  
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+  
+    
+	<!-- WEB SERVICE -->
+	<servlet>
+		<description>Apache CXF Servlet</description>
+		<servlet-name>CXFServlet</servlet-name>
+		<servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
+    	<load-on-startup>1</load-on-startup>
+	</servlet>
+  
+	<servlet-mapping>
+		<servlet-name>CXFServlet</servlet-name>
+		<url-pattern>/rest/*</url-pattern>
+	</servlet-mapping>
+  
+  
+	<!--  WEB APPLICATION -->
+	<servlet>
+		<description>Spring MVC Servlet</description>
+		<servlet-name>MVCServlet</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>/WEB-INF/servletContext.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+		
+	<servlet-mapping>
+		<servlet-name>MVCServlet</servlet-name>
+		<url-pattern>/ux/*</url-pattern>
+	</servlet-mapping>
+	
+	
+	<!-- LOG4J INIT SERVLET -->
+	<servlet>
+		<servlet-name>Log4JInitServlet</servlet-name>
+		<servlet-class>com.djt.social.config.Log4JInitServlet</servlet-class>
+		<init-param>
+			<param-name>log4j-properties-location</param-name>
+			<param-value>/WEB-INF/log4j.properties</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>Log4JInitServlet</servlet-name>
+		<url-pattern>/log4j</url-pattern>
+	</servlet-mapping>
+	
+
+	<!-- JSONP FILTER -->  
+	<filter>
+		<filter-name>JSONPRequestFilter</filter-name>
+		<filter-class>com.djt.social.filter.JSONPRequestFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>JSONPRequestFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+    
+    
+    <!-- HIDDEN METHOD FILTER (FOR HANDLING HTTP DELETE FOR REST OPERATIONS THAT INVOLVE DELETING RESOURCES) -->
+	<filter>
+		<filter-name>hiddenHttpMethodFilter</filter-name>
+		<filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>hiddenHttpMethodFilter</filter-name>
+		<url-pattern>/ux/connect/*</url-pattern>
+	</filter-mapping>
+      
+      
+    <!-- SESSION CONFIG (SESSIONS ARE USED FOR OAUTH AUTHENTICATION WITH SOCIAL PROVIDERS)-->  
+	<session-config>
+		<session-timeout>10</session-timeout>
+	</session-config>      
+      
+      
+    <!-- WELCOME PAGE (DEFAULTS TO APACHE CXF WADL) -->  
+    <welcome-file-list>
+     	<welcome-file>welcome.html</welcome-file>
+    </welcome-file-list>
+      
+</web-app>
