@@ -1,3 +1,7 @@
+<!-- 
+  To see what can be updated: 
+    mvn versions:display-plugin-updates 
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.djt.social</groupId>
@@ -424,7 +428,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.12</version>
+				<version>2.12.4</version>
 	            <configuration>
 	              <excludes>
 	                <exclude>**/Tests*</exclude>
@@ -479,7 +483,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
-				<version>2.1.1</version>
+				<version>2.3</version>
 				<configuration>
 					<warName>spring-social-service</warName>
 				</configuration>
@@ -524,7 +528,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>2.12</version>
+				<version>2.12.4</version>
 				<configuration>
 					<argLine>-Dfile.encoding=${project.build.sourceEncoding}</argLine>
 				</configuration>
@@ -576,5 +580,8 @@
 		        </configuration>
 		      </plugin>
 		</plugins>
-	</reporting>  
+	</reporting>
+	<prerequisites>
+		<maven>2.2.1</maven>
+	</prerequisites>	  
 </project>
